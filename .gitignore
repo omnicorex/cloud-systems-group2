@@ -1,0 +1,22 @@
+# ── Dependencies (dev only — ffmpeg-static for frame extraction) ──
+node_modules/
+package-lock.json
+
+# ── Dev tooling ──
+extract-frames.js
+package.json
+
+# ── Claude Code internal files ──
+.claude/
+
+# ── OS / editor noise ──
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+.vscode/
+.idea/
+
+# ── Cloudflare Pages build output (if ever added) ──
+.wrangler/
+dist/
