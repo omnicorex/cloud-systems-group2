@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh api:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(i[''''path'''']\\) for i in data.get\\(''''tree'''',[]\\)]\")",
+      "Bash(ffmpeg -i \"C:\\\\MyDev\\\\cloud-systems-group2\\\\public\\\\videos\\\\house-network-exploding-view.mp4\")",
+      "Bash(where ffmpeg:*)",
+      "Bash(npx --yes @ffmpeg-installer/ffmpeg --version)",
+      "Bash(node -e \":*)",
+      "Bash(node -e \"const fs=require\\(''fs''\\); if\\(!fs.existsSync\\(''package.json''\\)\\) { fs.writeFileSync\\(''package.json'', JSON.stringify\\({name:''cloud-systems-group2'',version:''1.0.0'',private:true},null,2\\)\\); console.log\\(''created package.json''\\); } else { console.log\\(''package.json exists''\\); }\")",
+      "Bash(npm install:*)",
+      "Bash(node extract-frames.js)",
+      "Bash(Measure-Object -Line)",
+      "Bash(Select-Object -ExpandProperty Lines)",
+      "Bash(node -e \"const fs=require\\(''fs''\\); const f=fs.readdirSync\\(''C:/MyDev/cloud-systems-group2/public/frames''\\).filter\\(x=>x.endsWith\\(''.jpg''\\)\\); console.log\\(f.length,''frames, first:'',f[0],''last:'',f[f.length-1]\\)\")"
+    ]
+  }
+}

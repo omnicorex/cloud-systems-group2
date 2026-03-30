@@ -1,0 +1,2208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud Systems Group — Full-Service Network Infrastructure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
+  <style>
+    /* ================================================
+       DESIGN TOKENS
+       DESIGN_VARIANCE: 8 | MOTION_INTENSITY: 6 | VISUAL_DENSITY: 4
+    ================================================ */
+    :root {
+      --bg-base:       #0b0b0f;
+      --bg-surface:    #111116;
+      --bg-card:       #17171e;
+      --bg-card-hover: #1c1c26;
+      --border:        #24242e;
+      --border-subtle: #1a1a22;
+      --accent:        #c4753b;
+      --accent-dim:    rgba(196,117,59,0.10);
+      --accent-mid:    rgba(196,117,59,0.28);
+      --text-primary:  #edeae4;
+      --text-secondary:#7c7870;
+      --text-muted:    #454340;
+      --radius-sm:     0.75rem;
+      --radius-md:     1.25rem;
+      --radius-lg:     2rem;
+      --radius-xl:     2.5rem;
+    }
+
+    /* ================================================
+       RESET & BASE
+    ================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100dvh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    button { font-family: inherit; cursor: pointer; border: none; }
+
+    /* Film grain overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.02;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ================================================
+       NAVIGATION
+    ================================================ */
+    nav {
+      position: fixed;
+      inset-block-start: 0;
+      inset-inline: 0;
+      z-index: 900;
+      padding: 1.125rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(11,11,15,0.72);
+      backdrop-filter: blur(22px) saturate(1.3);
+      -webkit-backdrop-filter: blur(22px) saturate(1.3);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background 0.4s ease;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .nav-logo-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .nav-logo-mark img { display: block; width: 36px; height: 36px; }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+      transition: color 0.2s ease;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.575rem 1.25rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 100px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .nav-cta:hover { opacity: 0.88; transform: translateY(-1px) scale(1.02); }
+
+    /* ================================================
+       HERO — ASYMMETRIC SPLIT
+    ================================================ */
+    .hero {
+      min-height: 100dvh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Video background ── */
+    .hero-video-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    #hero-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      will-change: opacity;
+      /* opacity managed by JS for seamless loop */
+    }
+    /* Directional scrim: dense on left for text, thinner toward right for video */
+    .hero-video-scrim {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(
+          to right,
+          rgba(11,11,15,0.82) 0%,
+          rgba(11,11,15,0.55) 45%,
+          rgba(11,11,15,0.22) 100%
+        ),
+        linear-gradient(
+          to top,
+          rgba(11,11,15,0.6) 0%,
+          transparent 40%
+        );
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 3.5rem 5rem 2.5rem;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 2.25rem;
+      width: fit-content;
+      background: var(--accent-dim);
+    }
+    .hero-tag-dot {
+      width: 5px;
+      height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    h1.hero-headline {
+      font-size: clamp(3.25rem, 5.8vw, 6rem);
+      font-weight: 700;
+      letter-spacing: -0.045em;
+      line-height: 0.94;
+      color: var(--text-primary);
+      margin-bottom: 1.875rem;
+    }
+    h1.hero-headline em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 44ch;
+      margin-bottom: 2.75rem;
+    }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.875rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 100px;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s ease;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.14);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .btn-primary:hover { transform: translateY(-2px) scale(1.02); }
+    .btn-primary:hover::before { opacity: 1; }
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.5rem;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.9375rem;
+      font-weight: 400;
+      transition: color 0.2s ease, border-color 0.2s ease, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .btn-ghost:hover {
+      color: var(--text-primary);
+      border-color: var(--text-muted);
+      transform: translateY(-1px);
+    }
+    .hero-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 3.5rem 0 2.5rem;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+    }
+    .stat-num {
+      font-size: 1.875rem;
+      font-weight: 700;
+      letter-spacing: -0.05em;
+      color: var(--text-primary);
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+
+    /* Hero right — network canvas */
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+    }
+    #hero-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    /* hero-right-fade-l and hero-right-fade-b removed —
+       the full-width video scrim handles all overlay/darkening.
+       Keeping those solid-color gradients caused a visible split
+       line at the grid column boundary on widescreen. */
+    .hero-right-fade-l,
+    .hero-right-fade-b { display: none; }
+    /* Floating status card */
+    .hero-float-card {
+      position: absolute;
+      bottom: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      background: rgba(23,23,30,0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.375rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      min-width: 270px;
+      animation: floatY 5s ease-in-out infinite;
+    }
+    @keyframes floatY {
+      0%, 100% { transform: translateX(-50%) translateY(0px); }
+      50%       { transform: translateX(-50%) translateY(-10px); }
+    }
+    .float-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-mid);
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .float-num  { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.03em; }
+    .float-desc { font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.1rem; }
+    /* Second float card */
+    .hero-float-card-2 {
+      position: absolute;
+      top: 28%;
+      right: 2rem;
+      z-index: 2;
+      background: rgba(23,23,30,0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.875rem 1.125rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      animation: floatY2 6s 1s ease-in-out infinite;
+    }
+    @keyframes floatY2 {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-8px); }
+    }
+    .float-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3dc97a;
+      box-shadow: 0 0 0 3px rgba(61,201,122,0.2);
+      animation: statusPulse 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes statusPulse {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(61,201,122,0.2); }
+      50%       { box-shadow: 0 0 0 6px rgba(61,201,122,0.08); }
+    }
+    .float-status-text { font-size: 0.8125rem; font-weight: 500; color: var(--text-primary); }
+    .float-status-sub  { font-size: 0.74rem; color: var(--text-secondary); }
+
+    /* ================================================
+       TICKER BAR
+    ================================================ */
+    .ticker-wrap {
+      background: var(--bg-surface);
+      border-block: 1px solid var(--border-subtle);
+      overflow: hidden;
+      padding: 0.8rem 0;
+    }
+    .ticker-track {
+      display: flex;
+      white-space: nowrap;
+      animation: ticker 30s linear infinite;
+    }
+    .ticker-track:hover { animation-play-state: paused; }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0 2.25rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.025em;
+      flex-shrink: 0;
+    }
+    .ticker-item .sep {
+      width: 3px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ================================================
+       SECTION UTILITIES
+    ================================================ */
+    .section { padding: 6.5rem 2.5rem; }
+    .section--alt { background: var(--bg-surface); border-block: 1px solid var(--border-subtle); }
+    .container { max-width: 1240px; margin: 0 auto; }
+    .lbl {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      margin-bottom: 0.875rem;
+    }
+    h2.title {
+      font-size: clamp(2rem, 3.6vw, 3.375rem);
+      font-weight: 700;
+      letter-spacing: -0.045em;
+      line-height: 1.03;
+    }
+    h2.title em { font-style: normal; color: var(--accent); }
+    p.sub {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.72;
+      max-width: 52ch;
+      margin-top: 0.875rem;
+    }
+
+    /* ================================================
+       SERVICES — BENTO 2.0
+    ================================================ */
+    .services-head {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: end;
+      margin-bottom: 3rem;
+    }
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 0.875rem;
+    }
+    /* Span variants */
+    .b-7  { grid-column: span 7; }
+    .b-5  { grid-column: span 5; }
+    .b-4  { grid-column: span 4; }
+
+    .bento-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 2rem 2rem 1.875rem;
+      position: relative;
+      overflow: hidden;
+      transition:
+        border-color 0.3s ease,
+        transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .bento-card:hover { transform: translateY(-4px); }
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 10% 10%, var(--accent-dim), transparent 65%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+    .bento-card:hover::before { opacity: 1; }
+
+    .b-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 11px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-mid);
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      margin-bottom: 1.375rem;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .bento-card:hover .b-icon { transform: scale(1.12) rotate(-4deg); }
+    .b-title {
+      font-size: 1.1875rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.55rem;
+    }
+    .b-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+    .b-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+      margin-top: 1.375rem;
+    }
+    .b-tag {
+      padding: 0.275rem 0.65rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.73rem;
+      color: var(--text-secondary);
+    }
+    /* Decorative radial art */
+    .b-art {
+      position: absolute;
+      inset-inline-end: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.05;
+      pointer-events: none;
+    }
+
+    /* ================================================
+       WHY US — SPLIT
+    ================================================ */
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 5.5rem;
+      align-items: center;
+    }
+    .why-numbers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-top: 2.75rem;
+    }
+    .why-num-cell {
+      background: var(--bg-card);
+      padding: 1.625rem 1.5rem;
+    }
+    .wn-value {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.055em;
+    }
+    .wn-value span { color: var(--accent); }
+    .wn-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.35rem;
+      line-height: 1.5;
+    }
+    .why-features { display: flex; flex-direction: column; gap: 0.875rem; }
+    .wf-item {
+      display: flex;
+      gap: 1.125rem;
+      padding: 1.375rem 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition:
+        border-color 0.25s ease,
+        transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .wf-item:hover {
+      border-color: var(--accent-mid);
+      transform: translateX(5px);
+    }
+    .wf-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-mid);
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .wf-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.3rem;
+    }
+    .wf-desc { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ================================================
+       PROCESS — STEPPED TIMELINE
+    ================================================ */
+    .process-head { text-align: center; margin-bottom: 4.5rem; }
+    .process-head .sub { margin-inline: auto; }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 1.15rem;
+      left: calc(12.5% + 1rem);
+      right: calc(12.5% + 1rem);
+      height: 1px;
+      background: var(--border);
+      z-index: 0;
+    }
+    /* Accent line from step 1 to 2 */
+    .steps::after {
+      content: '';
+      position: absolute;
+      top: 1.15rem;
+      left: calc(12.5% + 1rem);
+      width: calc(25% - 2rem);
+      height: 1px;
+      background: var(--accent);
+      z-index: 0;
+    }
+    .step {
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .step-circle {
+      width: 2.375rem;
+      height: 2.375rem;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--bg-base);
+      display: grid;
+      place-items: center;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 1.625rem;
+      font-family: 'DM Mono', monospace;
+      transition:
+        border-color 0.3s ease,
+        color 0.3s ease,
+        background 0.3s ease;
+    }
+    .step:first-child .step-circle,
+    .step:hover .step-circle {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+    .step-title {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.5rem;
+    }
+    .step-desc { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.65; }
+
+    /* ================================================
+       COVERAGE — CANVAS SPLIT
+    ================================================ */
+    .coverage-grid {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    .coverage-canvas-wrap {
+      position: relative;
+      aspect-ratio: 4/3;
+      border-radius: var(--radius-xl);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    #coverage-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .cov-overlay {
+      position: absolute;
+      inset-inline: 1.25rem;
+      inset-block-end: 1.25rem;
+      background: rgba(11,11,15,0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.875rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1;
+    }
+    .cov-stat-num {
+      font-size: 1.375rem;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+    .cov-stat-num span { color: var(--accent); }
+    .cov-stat-lbl { font-size: 0.73rem; color: var(--text-secondary); margin-top: 0.2rem; }
+    .cov-divider { width: 1px; height: 2rem; background: var(--border); }
+    .coverage-list { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 2rem; }
+    .cov-row {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      padding: 0.875rem 1.125rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      transition:
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .cov-row:hover {
+      border-color: var(--accent-mid);
+      color: var(--text-primary);
+      transform: translateX(5px);
+    }
+    .cov-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-mid);
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ================================================
+       TESTIMONIALS
+    ================================================ */
+    .testi-grid {
+      display: grid;
+      grid-template-columns: 1.55fr 1fr 1fr;
+      gap: 0.875rem;
+      margin-top: 3rem;
+    }
+    .testi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 1.875rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      transition:
+        border-color 0.25s ease,
+        transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .testi-card:hover {
+      border-color: var(--accent-mid);
+      transform: translateY(-4px);
+    }
+    .testi-stars { color: var(--accent); font-size: 0.875rem; letter-spacing: 0.05em; }
+    .testi-quote {
+      font-size: 0.9375rem;
+      color: var(--text-primary);
+      line-height: 1.72;
+    }
+    .testi-card--large .testi-quote { font-size: 1.0625rem; }
+    .testi-author {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: auto;
+      padding-top: 0.875rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .testi-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .testi-name { font-size: 0.875rem; font-weight: 600; }
+    .testi-role { font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.1rem; }
+
+    /* ================================================
+       CTA BAND
+    ================================================ */
+    .cta-band {
+      background: var(--bg-card);
+      border-block: 1px solid var(--border);
+      padding: 5.5rem 2.5rem;
+    }
+    .cta-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4.5rem;
+      align-items: start;
+    }
+    .cta-title {
+      font-size: clamp(2rem, 3.2vw, 3.125rem);
+      font-weight: 700;
+      letter-spacing: -0.045em;
+      line-height: 1.04;
+    }
+    .cta-title em { font-style: normal; color: var(--accent); }
+    .cta-sub { font-size: 1rem; color: var(--text-secondary); line-height: 1.72; margin-top: 1rem; }
+
+    /* Form */
+    .form { display: flex; flex-direction: column; gap: 0.75rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .field { display: flex; flex-direction: column; gap: 0.375rem; }
+    .field-label { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); }
+    .field-input,
+    .field-select {
+      padding: 0.725rem 0.9375rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      appearance: none;
+    }
+    .field-input::placeholder { color: var(--text-muted); }
+    .field-input:focus,
+    .field-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+    .field-select { color: var(--text-secondary); }
+    .field-select:focus { color: var(--text-primary); }
+    .form-btn {
+      margin-top: 0.25rem;
+      padding: 0.875rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .form-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ================================================
+       FOOTER
+    ================================================ */
+    footer {
+      background: var(--bg-base);
+      border-top: 1px solid var(--border-subtle);
+      padding: 4rem 2.5rem 2.25rem;
+    }
+    .footer-inner { max-width: 1240px; margin: 0 auto; }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 3rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    /* Animated footer eclipse logo */
+    .footer-eclipse-svg {
+      width: 38px;
+      height: 38px;
+      display: block;
+      flex-shrink: 0;
+      transition:
+        filter    0.45s ease,
+        transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .footer-brand:hover .footer-eclipse-svg {
+      filter: brightness(1.3) drop-shadow(0 0 7px rgba(196,117,59,0.38));
+      transform: scale(1.07);
+    }
+
+    .footer-tagline {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-top: 0.875rem;
+      max-width: 27ch;
+    }
+    .footer-col-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.125rem;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .footer-links a {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      transition: color 0.2s ease;
+    }
+    .footer-links a:hover { color: var(--text-primary); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.875rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* ================================================
+       REVEAL ANIMATION
+    ================================================ */
+    .rv {
+      opacity: 0;
+      transform: translateY(22px);
+      transition:
+        opacity  0.65s cubic-bezier(0.25,0.46,0.45,0.94),
+        transform 0.65s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .rv.vis { opacity: 1; transform: translateY(0); }
+    .d1 { transition-delay: 0.08s; }
+    .d2 { transition-delay: 0.16s; }
+    .d3 { transition-delay: 0.24s; }
+    .d4 { transition-delay: 0.32s; }
+    .d5 { transition-delay: 0.40s; }
+
+    /* ================================================
+       SCROLL VIDEO SCRUBBER
+    ================================================ */
+
+    /* Outer scroll driver — 450 vh gives ~112 vh per panel */
+    .svs-outer {
+      height: 450vh;
+      position: relative;
+    }
+
+    /* Sticky viewport-filling container */
+    .svs-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* ── Left text column ── */
+    .svs-left {
+      background: var(--bg-base);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 5rem 3.5rem 4.5rem 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle noise texture on left column */
+    .svs-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 0% 60%, rgba(196,117,59,0.04) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .svs-section-lbl {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      margin-bottom: 3.5rem;
+    }
+
+    /* Fixed-height panel container — all 4 panels live here absolutely */
+    .svs-panels-wrap {
+      position: relative;
+      height: 250px;
+      flex-shrink: 0;
+    }
+
+    .svs-panel {
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline: 0;
+      opacity: 0;
+      transform: translateY(20px);
+      transition:
+        opacity  0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      pointer-events: none;
+    }
+    /* Active panel — visible, in place */
+    .svs-panel.svs-active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    /* Panel that has already passed — exits upward */
+    .svs-panel.svs-past {
+      opacity: 0;
+      transform: translateY(-20px);
+      transition:
+        opacity  0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .svs-step-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 1.125rem;
+    }
+    .svs-panel-title {
+      font-size: clamp(1.875rem, 2.5vw, 2.75rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.04;
+      color: var(--text-primary);
+      margin-bottom: 1.125rem;
+    }
+    .svs-panel-desc {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.72;
+      max-width: 40ch;
+    }
+
+    /* Progress — track bar + step dots */
+    .svs-progress {
+      margin-top: 3.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+    }
+    .svs-track {
+      width: 220px;
+      height: 2px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 1px;
+      overflow: hidden;
+      position: relative;
+    }
+    .svs-track-fill {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: 0;
+      width: 25%;
+      background: var(--accent);
+      border-radius: 1px;
+      transition: width 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .svs-dots {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+    }
+    .svs-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      transition:
+        background 0.35s ease,
+        transform  0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        width      0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: default;
+    }
+    .svs-dot.svs-dot-active {
+      background: var(--accent);
+      transform: scale(1.5);
+    }
+    .svs-dot.svs-dot-done {
+      background: rgba(196,117,59,0.4);
+    }
+
+    /* Scroll cue */
+    .svs-scroll-cue {
+      position: absolute;
+      bottom: 2.25rem;
+      left: 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      transition: opacity 0.5s ease;
+      animation: cue-bob 2.4s ease-in-out infinite;
+    }
+    .svs-scroll-cue.svs-cue-hidden { opacity: 0; pointer-events: none; }
+    @keyframes cue-bob {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-4px); }
+    }
+
+    /* ── Right video column ── */
+    .svs-right {
+      background: var(--bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 2.5rem;
+    }
+
+    /* Subtle vignette around video */
+    /* .svs-right::after vignette removed —
+       the canvas mask-image handles edge blending directly,
+       so a colour overlay on top is no longer needed. */
+
+    /* #explode-video removed — replaced by #explode-canvas */
+
+    /* Canvas fills the right column */
+    #explode-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      position: relative;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+
+      /*
+       * Radial mask — makes canvas pixels physically transparent at the
+       * edges so the render dissolves into the container background with
+       * no visible rectangle or hard boundary.
+       * Black = fully opaque  |  transparent = fully invisible
+       */
+      -webkit-mask-image: radial-gradient(
+        ellipse 78% 78% at 50% 50%,
+        #000        30%,
+        rgba(0,0,0,0.96) 48%,
+        rgba(0,0,0,0.75) 62%,
+        rgba(0,0,0,0.35) 76%,
+        transparent      92%
+      );
+      mask-image: radial-gradient(
+        ellipse 78% 78% at 50% 50%,
+        #000        30%,
+        rgba(0,0,0,0.96) 48%,
+        rgba(0,0,0,0.75) 62%,
+        rgba(0,0,0,0.35) 76%,
+        transparent      92%
+      );
+    }
+    #explode-canvas.svs-ready { opacity: 1; }
+
+    /* Loading overlay */
+    .svs-loader-wrap {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      background: var(--bg-surface);
+      transition: opacity 0.4s ease;
+    }
+    .svs-loader-wrap.svs-loader-done {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .svs-loader-track {
+      width: 160px;
+      height: 2px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+    .svs-loader-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      border-radius: 1px;
+      transition: width 0.15s ease;
+    }
+    .svs-loader-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      .svs-sticky {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+      }
+      .svs-left  { border-right: none; border-bottom: 1px solid var(--border); padding: 3rem 1.5rem 2rem; }
+      .svs-right { padding: 1.5rem; }
+      .svs-panels-wrap { height: 210px; }
+    }
+    @media (max-width: 640px) {
+      .svs-outer { height: 500vh; }
+      .svs-panels-wrap { height: 230px; }
+      .svs-panel-title { font-size: 1.625rem; }
+    }
+
+    /* ================================================
+       RESPONSIVE
+    ================================================ */
+    @media (max-width: 1024px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+      .hero-left { padding: 7rem 2rem 4rem; }
+      .services-head { grid-template-columns: 1fr; }
+      .bento { grid-template-columns: 1fr 1fr; }
+      .b-7, .b-5, .b-4 { grid-column: span 1; }
+      .why-grid, .coverage-grid, .cta-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .steps { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+      .steps::before, .steps::after { display: none; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { display: none; }
+      .section { padding: 4rem 1.25rem; }
+      .hero-left { padding: 6rem 1.25rem 3.5rem; }
+      .hero-stats { gap: 2rem; flex-wrap: wrap; }
+      .bento { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
+      .why-numbers { grid-template-columns: 1fr 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .cta-band { padding: 4rem 1.25rem; }
+      .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+      .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- =============================================
+     NAVIGATION
+============================================= -->
+<nav id="main-nav">
+  <div class="nav-logo">
+    <div class="nav-logo-mark">
+      <img src="logo.svg" alt="Cloud Systems Group logo mark" width="36" height="36" />
+    </div>
+    Cloud Systems Group
+  </div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#testimonials">Clients</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">
+    Get a Quote
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</nav>
+
+<!-- =============================================
+     HERO
+============================================= -->
+<section class="hero" id="home">
+
+  <!-- VIDEO BACKGROUND -->
+  <div class="hero-video-bg">
+    <video
+      id="hero-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto"
+    >
+      <source src="public/videos/sorority-cutaway.mp4" type="video/mp4">
+    </video>
+    <div class="hero-video-scrim"></div>
+  </div>
+
+  <!-- LEFT — content -->
+  <div class="hero-left">
+    <div class="hero-tag rv">
+      <span class="hero-tag-dot"></span>
+      Network Infrastructure
+    </div>
+    <h1 class="hero-headline rv d1">
+      Built<br>for <em>Zero</em><br>Downtime.
+    </h1>
+    <p class="hero-sub rv d2">
+      Full-service network cabling, enterprise Wi-Fi installation,
+      and ongoing configuration management — engineered for
+      reliability from day one.
+    </p>
+    <div class="hero-actions rv d3">
+      <a href="#contact" class="btn-primary">
+        Start Your Project
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#services" class="btn-ghost">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M7 4.5v2.5l2 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Explore Services
+      </a>
+    </div>
+  </div>
+
+  <!-- RIGHT — animated network canvas -->
+  <div class="hero-right">
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-right-fade-l"></div>
+    <div class="hero-right-fade-b"></div>
+
+    <!-- Floating card 1 -->
+    <div class="hero-float-card">
+      <div class="float-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2L3 6v5c0 4.2 3.1 8.1 7 9 3.9-.9 7-4.8 7-9V6L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="float-num">24/7 Network Ops</div>
+        <div class="float-desc">Active monitoring & rapid response</div>
+      </div>
+    </div>
+
+    <!-- Floating card 2 -->
+    <div class="hero-float-card-2">
+      <div class="float-status-dot"></div>
+      <div>
+        <div class="float-status-text">All Systems Operational</div>
+        <div class="float-status-sub">14 managed networks · 0 incidents</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     TICKER
+============================================= -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="ticker-item"><span class="sep"></span>Cat6A Structured Cabling</span>
+    <span class="ticker-item"><span class="sep"></span>Wi-Fi 6E Deployment</span>
+    <span class="ticker-item"><span class="sep"></span>Fiber Optic Termination</span>
+    <span class="ticker-item"><span class="sep"></span>Network Configuration</span>
+    <span class="ticker-item"><span class="sep"></span>VLAN Segmentation</span>
+    <span class="ticker-item"><span class="sep"></span>Patch Panel Termination</span>
+    <span class="ticker-item"><span class="sep"></span>RF Heat Mapping</span>
+    <span class="ticker-item"><span class="sep"></span>Remote Monitoring</span>
+    <span class="ticker-item"><span class="sep"></span>802.1X Authentication</span>
+    <span class="ticker-item"><span class="sep"></span>QoS Policy Management</span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item"><span class="sep"></span>Cat6A Structured Cabling</span>
+    <span class="ticker-item"><span class="sep"></span>Wi-Fi 6E Deployment</span>
+    <span class="ticker-item"><span class="sep"></span>Fiber Optic Termination</span>
+    <span class="ticker-item"><span class="sep"></span>Network Configuration</span>
+    <span class="ticker-item"><span class="sep"></span>VLAN Segmentation</span>
+    <span class="ticker-item"><span class="sep"></span>Patch Panel Termination</span>
+    <span class="ticker-item"><span class="sep"></span>RF Heat Mapping</span>
+    <span class="ticker-item"><span class="sep"></span>Remote Monitoring</span>
+    <span class="ticker-item"><span class="sep"></span>802.1X Authentication</span>
+    <span class="ticker-item"><span class="sep"></span>QoS Policy Management</span>
+  </div>
+</div>
+
+<!-- =============================================
+     SERVICES — BENTO 2.0
+============================================= -->
+<section class="section" id="services">
+  <div class="container">
+    <div class="services-head">
+      <div>
+        <p class="lbl rv">What We Do</p>
+        <h2 class="title rv d1">Infrastructure<br>that <em>scales</em>.</h2>
+      </div>
+      <p class="sub rv d2">From a single office drop to campus-wide structured cabling — enterprise-grade installations with surgical precision and zero-compromise documentation.</p>
+    </div>
+
+    <div class="bento">
+
+      <!-- Card 1 — Wide (7 cols) -->
+      <div class="bento-card b-7 rv">
+        <div class="b-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="2" y="13" width="4" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="9" y="9" width="4" height="11" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="16" y="5" width="4" height="15" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M4 13L11 9L18 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="b-title">Full-Service Network Cabling</h3>
+        <p class="b-desc">End-to-end structured cabling: Cat5e, Cat6, Cat6A, and single/multi-mode fiber. We manage pathway planning, conduit, termination, Fluke DSX-8000 certification testing, and BICSI-compliant as-built documentation.</p>
+        <div class="b-tags">
+          <span class="b-tag">Cat6 / Cat6A</span>
+          <span class="b-tag">OM3/OM4 Fiber</span>
+          <span class="b-tag">Patch Panels</span>
+          <span class="b-tag">Cable Tray</span>
+          <span class="b-tag">BICSI Certified</span>
+          <span class="b-tag">Fluke Tested</span>
+        </div>
+        <!-- Decorative target rings -->
+        <svg class="b-art" width="200" height="200" viewBox="0 0 200 200" fill="none">
+          <circle cx="100" cy="100" r="90" stroke="white" stroke-width="1"/>
+          <circle cx="100" cy="100" r="63" stroke="white" stroke-width="1"/>
+          <circle cx="100" cy="100" r="36" stroke="white" stroke-width="1"/>
+          <line x1="10"  y1="100" x2="190" y2="100" stroke="white" stroke-width="0.5"/>
+          <line x1="100" y1="10"  x2="100" y2="190" stroke="white" stroke-width="0.5"/>
+          <line x1="36"  y1="36"  x2="164" y2="164" stroke="white" stroke-width="0.4"/>
+          <line x1="164" y1="36"  x2="36"  y2="164" stroke="white" stroke-width="0.4"/>
+        </svg>
+      </div>
+
+      <!-- Card 2 — Mid (5 cols) -->
+      <div class="bento-card b-5 rv d1">
+        <div class="b-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M11 5C7 5 3.5 8 3 12M11 5C15 5 18.5 8 19 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M11 9C9 9 7.5 10.5 7 12M11 9C13 9 14.5 10.5 15 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="11" cy="15" r="2" fill="currentColor"/>
+            <path d="M11 17v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="b-title">Wi-Fi Installation & Optimization</h3>
+        <p class="b-desc">Precision AP placement via Ekahau Pro heat mapping. Wi-Fi 6 and 6E systems that eliminate dead zones and sustain throughput under high-density loads.</p>
+        <div class="b-tags">
+          <span class="b-tag">Wi-Fi 6E</span>
+          <span class="b-tag">Ekahau Heat Map</span>
+          <span class="b-tag">AP Placement</span>
+          <span class="b-tag">Load Balancing</span>
+        </div>
+      </div>
+
+      <!-- Card 3 — Third (4 cols) -->
+      <div class="bento-card b-4 rv d2">
+        <div class="b-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="3" y="7" width="16" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M7 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="11" cy="11" r="1.5" fill="currentColor"/>
+            <path d="M7 15v2M15 15v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="b-title">Network Configuration</h3>
+        <p class="b-desc">Switch setup, VLAN segmentation, firewall rules, and QoS configured and documented to your exact requirements.</p>
+        <div class="b-tags">
+          <span class="b-tag">VLANs</span>
+          <span class="b-tag">QoS</span>
+          <span class="b-tag">Firewalls</span>
+        </div>
+      </div>
+
+      <!-- Card 4 — Third (4 cols) -->
+      <div class="bento-card b-4 rv d3">
+        <div class="b-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M3 8l8-5 8 5v7l-8 5-8-5V8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M11 3v16M3 8l8 5 8-5" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <h3 class="b-title">Managed Network Services</h3>
+        <p class="b-desc">Continuous monitoring, proactive alerts, firmware updates, and guaranteed SLA response. Your network — always healthy.</p>
+        <div class="b-tags">
+          <span class="b-tag">24/7 NOC</span>
+          <span class="b-tag">SLA</span>
+          <span class="b-tag">Proactive</span>
+        </div>
+      </div>
+
+      <!-- Card 5 — Third (4 cols) -->
+      <div class="bento-card b-4 rv d4">
+        <div class="b-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <path d="M11 3L3 7v5c0 4.4 3.4 8.5 8 9.5 4.6-1 8-5.1 8-9.5V7L11 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M8 11l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3 class="b-title">Network Security</h3>
+        <p class="b-desc">NAC, 802.1X, rogue AP detection, and access control policies to protect every layer of your infrastructure.</p>
+        <div class="b-tags">
+          <span class="b-tag">802.1X</span>
+          <span class="b-tag">NAC</span>
+          <span class="b-tag">Segmentation</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     SCROLL VIDEO SCRUBBER
+============================================= -->
+<div class="svs-outer" id="svs">
+  <div class="svs-sticky">
+
+    <!-- LEFT — text content -->
+    <div class="svs-left">
+      <p class="svs-section-lbl">Comprehensive Services</p>
+
+      <div class="svs-panels-wrap">
+
+        <div class="svs-panel svs-active" data-panel="0">
+          <div class="svs-step-num">01 / 04</div>
+          <h3 class="svs-panel-title">Structured<br>Cabling</h3>
+          <p class="svs-panel-desc">Cat6A / fiber backbone, organised conduit runs, and certified terminations built for long-term performance.</p>
+        </div>
+
+        <div class="svs-panel" data-panel="1">
+          <div class="svs-step-num">02 / 04</div>
+          <h3 class="svs-panel-title">Wi-Fi<br>Deployment</h3>
+          <p class="svs-panel-desc">Enterprise-grade access point placement engineered for density, roaming, and predictable coverage.</p>
+        </div>
+
+        <div class="svs-panel" data-panel="2">
+          <div class="svs-step-num">03 / 04</div>
+          <h3 class="svs-panel-title">Configuration &amp;<br>Optimisation</h3>
+          <p class="svs-panel-desc">Network segmentation, VLAN design, QoS policies, and ongoing performance tuning.</p>
+        </div>
+
+        <div class="svs-panel" data-panel="3">
+          <div class="svs-step-num">04 / 04</div>
+          <h3 class="svs-panel-title">Ongoing<br>Management</h3>
+          <p class="svs-panel-desc">Remote monitoring, firmware management, incident response, and usage reporting.</p>
+        </div>
+
+      </div><!-- /panels-wrap -->
+
+      <!-- Progress indicator -->
+      <div class="svs-progress">
+        <div class="svs-track">
+          <div class="svs-track-fill" id="svs-track-fill"></div>
+        </div>
+        <div class="svs-dots">
+          <span class="svs-dot svs-dot-active" data-dot="0"></span>
+          <span class="svs-dot"                data-dot="1"></span>
+          <span class="svs-dot"                data-dot="2"></span>
+          <span class="svs-dot"                data-dot="3"></span>
+        </div>
+      </div>
+
+      <!-- Scroll cue (fades out after first scroll) -->
+      <div class="svs-scroll-cue" id="svs-scroll-cue">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 2v10M2 8l5 4 5-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Scroll to explore
+      </div>
+    </div><!-- /svs-left -->
+
+    <!-- RIGHT — canvas frame player -->
+    <div class="svs-right">
+      <!-- Loading bar (fades out once frames are ready) -->
+      <div class="svs-loader-wrap" id="svs-loader-wrap">
+        <div class="svs-loader-track">
+          <div class="svs-loader-bar" id="svs-loader-bar"></div>
+        </div>
+        <span class="svs-loader-label" id="svs-loader-label">Loading…</span>
+      </div>
+      <canvas id="explode-canvas"></canvas>
+    </div>
+
+  </div><!-- /svs-sticky -->
+</div><!-- /svs-outer -->
+
+<!-- =============================================
+     TESTIMONIALS
+============================================= -->
+<section class="section" id="testimonials">
+  <div class="container">
+    <p class="lbl rv">Client Results</p>
+    <h2 class="title rv d1">What our clients <em>say</em>.</h2>
+
+    <div class="testi-grid">
+      <div class="testi-card testi-card--large rv">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"Cloud Systems Group redesigned our entire office infrastructure across three floors. The structured cabling is immaculate — clearly labeled, properly dressed, and every run passed certification. Our IT team hasn't touched a cable issue in 18 months. That's the real ROI."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#3a6b8c;">MR</div>
+          <div>
+            <div class="testi-name">Marcus R.</div>
+            <div class="testi-role">IT Director · Meridan Financial Group</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card rv d1">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"Wi-Fi dead zones eliminated completely. They heat-mapped our warehouse before touching anything, and the AP placement was surgical. Zero returns."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#6b3a8c;">SL</div>
+          <div>
+            <div class="testi-name">Sarah L.</div>
+            <div class="testi-role">Operations Manager · PalletCore Logistics</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card rv d2">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"They worked exclusively after hours. Our staff didn't experience a single outage during the entire three-week retrofit across the facility."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#3a8c6b;">JT</div>
+          <div>
+            <div class="testi-name">James T.</div>
+            <div class="testi-role">CTO · Northfield Medical Center</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     CTA / CONTACT
+============================================= -->
+<div class="cta-band" id="contact">
+  <div class="cta-inner">
+    <div>
+      <p class="lbl rv">Get Started</p>
+      <h2 class="cta-title rv d1">Ready to build<br>something <em>solid</em>?</h2>
+      <p class="cta-sub rv d2">Send us your project details and we'll respond with a scoped quote within one business day. No obligation, no sales pressure.</p>
+    </div>
+
+    <form class="form rv d2" onsubmit="handleSubmit(event)" novalidate>
+      <div class="form-row">
+        <div class="field">
+          <label class="field-label">Full Name</label>
+          <input class="field-input" type="text" placeholder="Your name" required />
+        </div>
+        <div class="field">
+          <label class="field-label">Email Address</label>
+          <input class="field-input" type="email" placeholder="you@company.com" required />
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Company / Organization</label>
+        <input class="field-input" type="text" placeholder="Where is this installation?" />
+      </div>
+      <div class="field">
+        <label class="field-label">How Can We Help</label>
+        <textarea class="field-input" name="message" rows="5"
+          placeholder="Describe your project, ask a question, or share any details you'd like us to know — we'll follow up within one business day."
+          style="resize:vertical; min-height:7.5rem; line-height:1.6;"></textarea>
+      </div>
+      <button type="submit" class="form-btn">Send Enquiry →</button>
+    </form>
+  </div>
+</div>
+
+<!-- =============================================
+     FOOTER
+============================================= -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="nav-logo footer-brand">
+          <div class="nav-logo-mark">
+            <!-- Inline animated eclipse logo — SMIL only, no JS -->
+            <svg class="footer-eclipse-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cloud Systems Group logo mark" role="img">
+              <defs>
+                <mask id="fe-eclipse-mask">
+                  <rect width="44" height="44" fill="white"/>
+                  <circle cx="25" cy="22" r="11" fill="black"/>
+                </mask>
+                <radialGradient id="fe-sun-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%"   stop-color="#c4753b" stop-opacity="0.22"/>
+                  <stop offset="100%" stop-color="#c4753b" stop-opacity="0"/>
+                </radialGradient>
+                <radialGradient id="fe-sun-body" cx="38%" cy="40%" r="60%">
+                  <stop offset="0%"   stop-color="#e8924a"/>
+                  <stop offset="60%"  stop-color="#c4753b"/>
+                  <stop offset="100%" stop-color="#9a5526"/>
+                </radialGradient>
+                <linearGradient id="fe-ray-top" x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0%" stop-color="#c4753b" stop-opacity="0.65"/>
+                  <stop offset="100%" stop-color="#c4753b" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="fe-ray-bottom" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#c4753b" stop-opacity="0.65"/>
+                  <stop offset="100%" stop-color="#c4753b" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="fe-ray-left" x1="1" y1="0" x2="0" y2="0">
+                  <stop offset="0%" stop-color="#c4753b" stop-opacity="0.65"/>
+                  <stop offset="100%" stop-color="#c4753b" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="fe-ray-tl" x1="1" y1="1" x2="0" y2="0">
+                  <stop offset="0%" stop-color="#c4753b" stop-opacity="0.5"/>
+                  <stop offset="100%" stop-color="#c4753b" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="fe-ray-bl" x1="1" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#c4753b" stop-opacity="0.5"/>
+                  <stop offset="100%" stop-color="#c4753b" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Atmosphere rings — slow opacity breath -->
+              <circle cx="19" cy="22" r="18"
+                stroke="#c4753b" stroke-width="0.4" stroke-opacity="0.18"
+                mask="url(#fe-eclipse-mask)">
+                <animate attributeName="stroke-opacity"
+                  values="0.12;0.28;0.12" dur="5s"
+                  calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"
+                  repeatCount="indefinite"/>
+              </circle>
+              <circle cx="19" cy="22" r="16"
+                stroke="#c4753b" stroke-width="0.4" stroke-opacity="0.10"
+                mask="url(#fe-eclipse-mask)">
+                <animate attributeName="stroke-opacity"
+                  values="0.06;0.18;0.06" dur="5s" begin="0.6s"
+                  calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"
+                  repeatCount="indefinite"/>
+              </circle>
+
+              <!-- Corona rays group — very slow rotation around sun centre -->
+              <g>
+                <animateTransform attributeName="transform" type="rotate"
+                  from="0 19 22" to="360 19 22"
+                  dur="60s" repeatCount="indefinite"/>
+
+                <line x1="19" y1="10" x2="19" y2="4"
+                  stroke="url(#fe-ray-top)" stroke-width="1.4" stroke-linecap="round"/>
+                <line x1="19" y1="34" x2="19" y2="40"
+                  stroke="url(#fe-ray-bottom)" stroke-width="1.4" stroke-linecap="round"/>
+                <line x1="8"  y1="22" x2="2"  y2="22"
+                  stroke="url(#fe-ray-left)" stroke-width="1.4" stroke-linecap="round"/>
+                <line x1="12.5" y1="12.5" x2="7.5" y2="7.5"
+                  stroke="url(#fe-ray-tl)" stroke-width="1.1" stroke-linecap="round"/>
+                <line x1="12.5" y1="31.5" x2="7.5" y2="36.5"
+                  stroke="url(#fe-ray-bl)" stroke-width="1.1" stroke-linecap="round"/>
+                <!-- faint right-side rays -->
+                <line x1="30" y1="11" x2="33" y2="8"
+                  stroke="#c4753b" stroke-width="0.75" stroke-linecap="round" stroke-opacity="0.12"/>
+                <line x1="30" y1="33" x2="33" y2="36"
+                  stroke="#c4753b" stroke-width="0.75" stroke-linecap="round" stroke-opacity="0.12"/>
+              </g>
+
+              <!-- Sun corona glow -->
+              <circle cx="19" cy="22" r="14"
+                fill="url(#fe-sun-glow)"
+                mask="url(#fe-eclipse-mask)"/>
+
+              <!-- Sun body -->
+              <circle cx="19" cy="22" r="11"
+                fill="url(#fe-sun-body)"
+                mask="url(#fe-eclipse-mask)"/>
+
+              <!-- Sun limb ring -->
+              <circle cx="19" cy="22" r="11"
+                stroke="#e8924a" stroke-width="0.6" stroke-opacity="0.5"
+                fill="none"
+                mask="url(#fe-eclipse-mask)"/>
+
+              <!-- Moon disk outline -->
+              <circle cx="25" cy="22" r="11"
+                stroke="#c4753b" stroke-width="0.5" stroke-opacity="0.14"
+                fill="none"/>
+
+              <!-- Baily's bead — gentle heartbeat pulse -->
+              <circle cx="14.2" cy="22" fill="#e8924a">
+                <animate attributeName="r"
+                  values="1.1;1.55;1.1" dur="2.8s"
+                  calcMode="spline" keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+                  repeatCount="indefinite"/>
+                <animate attributeName="fill-opacity"
+                  values="0.9;1;0.9" dur="2.8s"
+                  calcMode="spline" keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+                  repeatCount="indefinite"/>
+              </circle>
+              <!-- Bead halo -->
+              <circle cx="14.2" cy="22" fill="#e8924a">
+                <animate attributeName="r"
+                  values="2.2;3.2;2.2" dur="2.8s"
+                  calcMode="spline" keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+                  repeatCount="indefinite"/>
+                <animate attributeName="fill-opacity"
+                  values="0.18;0.08;0.18" dur="2.8s"
+                  calcMode="spline" keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"
+                  repeatCount="indefinite"/>
+              </circle>
+            </svg>
+          </div>
+          Cloud Systems Group
+        </div>
+        <p class="footer-tagline">Professional network cabling, Wi-Fi, and infrastructure management. Built to last.</p>
+      </div>
+      <div>
+        <div class="footer-col-label">Services</div>
+        <ul class="footer-links">
+          <li><a href="#services">Network Cabling</a></li>
+          <li><a href="#services">Wi-Fi Installation</a></li>
+          <li><a href="#services">Configuration</a></li>
+          <li><a href="#services">Managed Services</a></li>
+          <li><a href="#services">Network Security</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-label">Navigate</div>
+        <ul class="footer-links">
+          <li><a href="#services">Our Services</a></li>
+          <li><a href="#svs">How We Work</a></li>
+          <li><a href="#testimonials">Client Stories</a></li>
+          <li><a href="#contact">Get a Quote</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-label">Contact</div>
+        <ul class="footer-links">
+          <li><a href="tel:+15551234567">(555) 123-4567</a></li>
+          <li><a href="mailto:info@cloudsystemsgroup.com">info@cloudsystemsgroup.com</a></li>
+          <li><a href="#contact">Request a Quote</a></li>
+          <li><a href="#">Support Portal</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Cloud Systems Group. All rights reserved.</span>
+      <span>BICSI Registered Telecommunications Installer</span>
+    </div>
+  </div>
+</footer>
+
+<!-- =============================================
+     JAVASCRIPT
+============================================= -->
+<script>
+/* -----------------------------------------------
+   HERO VIDEO — SEAMLESS FADE LOOP
+   Fades opacity in/out around the loop point so
+   the cut is completely invisible to the viewer.
+----------------------------------------------- */
+(function () {
+  const video = document.getElementById('hero-video');
+  if (!video) return;
+
+  const FADE = 1.8;        // seconds to fade in / out
+  const EASE_OUT = 4;      // power curve — makes the fade feel cinematic
+
+  // Start invisible; JS drives the fade-in once playback begins
+  video.style.opacity = '0';
+
+  function easeInOut(t) {
+    // Smooth cubic ease so opacity never jumps
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, EASE_OUT) / 2;
+  }
+
+  function updateOpacity() {
+    const { currentTime: t, duration: d } = video;
+    if (!d || isNaN(d)) return;
+
+    const remaining = d - t;
+    let raw;
+
+    if (t < FADE) {
+      raw = t / FADE;                   // fade in
+    } else if (remaining < FADE) {
+      raw = remaining / FADE;           // fade out
+    } else {
+      raw = 1;
+    }
+
+    video.style.opacity = easeInOut(Math.max(0, Math.min(1, raw))).toFixed(4);
+  }
+
+  video.addEventListener('timeupdate', updateOpacity);
+
+  // Graceful fallback — if autoplay is blocked, hide the element cleanly
+  const playPromise = video.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {
+      video.closest('.hero-video-bg').style.display = 'none';
+    });
+  }
+})();
+
+/* -----------------------------------------------
+   HERO NETWORK CANVAS
+----------------------------------------------- */
+(function () {
+  const canvas = document.getElementById('hero-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w, h, nodes = [], raf;
+  const mouse = { x: -9999, y: -9999 };
+  const N = 60;
+  const DIST = 155;
+  const ACCENT_RGB = '196,117,59';
+
+  function resize() {
+    w = canvas.width  = canvas.offsetWidth;
+    h = canvas.height = canvas.offsetHeight;
+  }
+
+  function init() {
+    nodes = Array.from({ length: N }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.38,
+      vy: (Math.random() - 0.5) * 0.38,
+      r:  Math.random() * 1.8 + 0.8,
+      t:  Math.random() * Math.PI * 2,
+    }));
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, w, h);
+
+    nodes.forEach(n => {
+      n.t  += 0.022;
+      n.x  += n.vx;
+      n.y  += n.vy;
+      if (n.x < 0 || n.x > w) n.vx *= -1;
+      if (n.y < 0 || n.y > h) n.vy *= -1;
+    });
+
+    // Connections
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const d  = Math.hypot(dx, dy);
+        if (d >= DIST) continue;
+
+        const alpha   = (1 - d / DIST);
+        const midX    = (nodes[i].x + nodes[j].x) / 2;
+        const midY    = (nodes[i].y + nodes[j].y) / 2;
+        const mDist   = Math.hypot(midX - mouse.x, midY - mouse.y);
+        const boost   = mDist < 130 ? 0.65 : 0.16;
+        const lw      = mDist < 130 ? 1 : 0.5;
+
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.strokeStyle = `rgba(${ACCENT_RGB},${alpha * boost})`;
+        ctx.lineWidth   = lw;
+        ctx.stroke();
+      }
+    }
+
+    // Nodes
+    nodes.forEach(n => {
+      const pulse = 0.6 + 0.4 * Math.sin(n.t);
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r * pulse, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${ACCENT_RGB},${0.55 * pulse})`;
+      ctx.fill();
+    });
+
+    raf = requestAnimationFrame(tick);
+  }
+
+  const parent = canvas.parentElement;
+  parent.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - r.left;
+    mouse.y = e.clientY - r.top;
+  });
+  parent.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+
+  window.addEventListener('resize', () => { resize(); init(); });
+  resize(); init(); tick();
+})();
+
+/* -----------------------------------------------
+   CANVAS FRAME SCRUBBER ENGINE
+   Pre-decodes all 121 JPEG frames into Image objects
+   and blits the correct one to a canvas on every
+   scroll event. Zero seek latency — buttery smooth.
+----------------------------------------------- */
+(function () {
+  const outer      = document.getElementById('svs');
+  const canvas     = document.getElementById('explode-canvas');
+  const loaderWrap = document.getElementById('svs-loader-wrap');
+  const loaderBar  = document.getElementById('svs-loader-bar');
+  const loaderLbl  = document.getElementById('svs-loader-label');
+  const panels     = document.querySelectorAll('.svs-panel');
+  const dots       = document.querySelectorAll('.svs-dot');
+  const trackFill  = document.getElementById('svs-track-fill');
+  const scrollCue  = document.getElementById('svs-scroll-cue');
+
+  if (!outer || !canvas) return;
+
+  const ctx         = canvas.getContext('2d');
+  const FRAME_COUNT = 121;
+  const PANEL_COUNT = 4;
+  const FRAME_DIR   = 'public/frames/';
+
+  const frames = new Array(FRAME_COUNT).fill(null);
+  let loadedCount  = 0;
+  let drawnFrame   = -1;
+  let prevPanelIdx = 0;
+  let lastProg     = -1;
+  let rafId        = null;
+  let cw = 0, ch = 0;   // physical pixel dimensions of canvas
+
+  /* ── Canvas sizing ─────────────────────────────── */
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr  = window.devicePixelRatio || 1;
+    cw = Math.round(rect.width  * dpr);
+    ch = Math.round(rect.height * dpr);
+    canvas.width  = cw;
+    canvas.height = ch;
+    // Redraw current frame at new size
+    if (drawnFrame >= 0) blitFrame(drawnFrame);
+  }
+
+  /* ── Draw one frame — object-fit: contain logic ── */
+  function blitFrame(idx) {
+    const img = frames[idx];
+    if (!img || !img.complete || !img.naturalWidth) return;
+    const scale = Math.min(cw / img.naturalWidth, ch / img.naturalHeight);
+    const dw = img.naturalWidth  * scale;
+    const dh = img.naturalHeight * scale;
+    const dx = (cw - dw) / 2;
+    const dy = (ch - dh) / 2;
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.drawImage(img, dx, dy, dw, dh);
+    drawnFrame = idx;
+  }
+
+  /* ── Raw scroll progress 0→1 through the entire sticky section ── */
+  function getRawProg() {
+    const rect       = outer.getBoundingClientRect();
+    const scrollable = outer.offsetHeight - window.innerHeight;
+    return Math.max(0, Math.min(1, -rect.top / scrollable));
+  }
+
+  /*
+   * DWELL_END = the fraction of total scroll at which the animation
+   * finishes. Everything from DWELL_END → 1.0 is a frozen "dwell"
+   * zone — the last frame and last panel stay visible while the user
+   * keeps scrolling, giving them time to read before the section exits.
+   *
+   * With svs-outer at 450vh and DWELL_END = 0.78:
+   *   animation plays across the first ~351vh
+   *   last ~99vh is frozen dwell (~1 viewport of comfortable reading time)
+   */
+  const DWELL_END = 0.78;
+
+  function getAnimProg() {
+    return Math.min(1, getRawProg() / DWELL_END);
+  }
+
+  /* ── Main RAF loop ──────────────────────────────── */
+  function tick() {
+    const prog = getAnimProg();
+
+    if (Math.abs(prog - lastProg) > 0.00008) {
+      lastProg = prog;
+
+      /* 1 — Pick and blit the correct frame */
+      const frameIdx = Math.min(Math.floor(prog * FRAME_COUNT), FRAME_COUNT - 1);
+      if (frameIdx !== drawnFrame) blitFrame(frameIdx);
+
+      /* 2 — Panel transitions */
+      const panelIdx = Math.min(Math.floor(prog * PANEL_COUNT), PANEL_COUNT - 1);
+      if (panelIdx !== prevPanelIdx) {
+        panels.forEach((p, i) => {
+          p.classList.remove('svs-active', 'svs-past');
+          if (i === panelIdx)      p.classList.add('svs-active');
+          else if (i < panelIdx)   p.classList.add('svs-past');
+        });
+        dots.forEach((dot, i) => {
+          dot.classList.toggle('svs-dot-active', i === panelIdx);
+          dot.classList.toggle('svs-dot-done',   i < panelIdx);
+        });
+        if (trackFill) {
+          trackFill.style.width = `${((panelIdx + 1) / PANEL_COUNT) * 100}%`;
+        }
+        prevPanelIdx = panelIdx;
+      }
+
+      /* 3 — Scroll cue */
+      if (scrollCue) scrollCue.classList.toggle('svs-cue-hidden', prog > 0.04);
+    }
+
+    rafId = requestAnimationFrame(tick);
+  }
+
+  /* ── Frame preloader ────────────────────────────── */
+  function preload() {
+    let firstReady = false;
+
+    for (let i = 0; i < FRAME_COUNT; i++) {
+      const img = new Image();
+      // Hint browser to decode as high-priority for the first 30 frames
+      if (i < 30) img.fetchpriority = 'high';
+      img.decoding = 'async';
+      img.src = `${FRAME_DIR}frame_${String(i + 1).padStart(4, '0')}.jpg`;
+
+      img.onload = () => {
+        frames[i] = img;
+        loadedCount++;
+
+        /* Progress bar */
+        const pct = Math.round(loadedCount / FRAME_COUNT * 100);
+        if (loaderBar)  loaderBar.style.width  = pct + '%';
+        if (loaderLbl)  loaderLbl.textContent  = pct + '%';
+
+        /* Show canvas and start the tick as soon as frame 0 is ready */
+        if (!firstReady && i === 0) {
+          firstReady = true;
+          resizeCanvas();
+          blitFrame(0);
+          canvas.classList.add('svs-ready');
+        }
+
+        /* Hide loader once all frames are in */
+        if (loadedCount === FRAME_COUNT && loaderWrap) {
+          loaderWrap.classList.add('svs-loader-done');
+        }
+      };
+
+      frames[i] = img; // store even before load so array slots are filled
+    }
+  }
+
+  /* ── Init ───────────────────────────────────────── */
+  resizeCanvas();
+  preload();
+  window.addEventListener('resize', resizeCanvas, { passive: true });
+
+  /* Start the tick loop */
+  tick();
+
+  /* Suspend RAF when section is off-screen to save GPU */
+  new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        if (!rafId) tick();
+      } else {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    },
+    { rootMargin: '300px' }
+  ).observe(outer);
+})();
+
+/* -----------------------------------------------
+   SCROLL REVEAL
+----------------------------------------------- */
+(function () {
+  const io = new IntersectionObserver(
+    entries => entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('vis'); io.unobserve(e.target); }
+    }),
+    { threshold: 0.1, rootMargin: '0px 0px -36px 0px' }
+  );
+  document.querySelectorAll('.rv').forEach(el => io.observe(el));
+})();
+
+/* -----------------------------------------------
+   FORM SUBMIT
+----------------------------------------------- */
+function handleSubmit(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.form-btn');
+  btn.textContent = 'Message Sent ✓';
+  btn.style.background = '#3a8c6b';
+  btn.disabled = true;
+}
+
+/* -----------------------------------------------
+   NAV SCROLL TINT
+----------------------------------------------- */
+window.addEventListener('scroll', () => {
+  document.getElementById('main-nav').style.background =
+    window.scrollY > 50
+      ? 'rgba(11,11,15,0.94)'
+      : 'rgba(11,11,15,0.72)';
+}, { passive: true });
+</script>
+</body>
+</html>
